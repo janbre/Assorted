@@ -1,0 +1,21 @@
+icecast
+ |
+  ----- libcurl
+  ----- libxslt
+
+ices
+ |
+  ----- libshout
+ |       |
+ |        ----- libspeex
+ |        ----- libtheora
+ |        ----- libvorbisidec
+ |
+  ----- alsa-lib
+         |
+          ----- kmod-sound-core
+         |       |
+         |        ----- kmod-input-core
+         |
+          ----- librt
+

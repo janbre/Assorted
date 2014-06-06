@@ -1,0 +1,37 @@
+<ices>
+
+  <!-- GENERIC -->
+  <background>1</background>
+  <pidfile>/var/run/icecast/ices1.pid</pidfile>
+
+  <!-- LOGGING -->
+  <logpath>/mnt/usb/PirateBoxRadio/log/icecast</logpath>
+  <logfile>ices1.log</logfile>
+  <logsize>2048</logsize>
+  <loglevel>3</loglevel>
+  <consolelog>0</consolelog>
+
+  <!-- STREAM -->
+  <stream>
+    <metadata>
+      <name>Testradio: One</name>
+      <genre>Varios</genre>
+      <description>Local Test Radio</description>
+      <url>http://dc01:8000/</url>
+    </metadata>
+    <input>
+      <param name="type">basic</param>
+      <param name="file">/mnt/usb/PirateBoxRadio/playlist1.txt</param>
+      <param name="random">1</param>
+      <param name="once">0</param>
+      <param name="restart-after-reread">1</param>
+    </input>
+    <instance>
+      <hostname>dc01</hostname>
+      <port>8000</port>
+      <password>pirateboxradioFTW!</password>
+      <mount>/one.ogg</mount>
+    </instance>
+  </stream>
+
+</ices>

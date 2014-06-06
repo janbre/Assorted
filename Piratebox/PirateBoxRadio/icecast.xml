@@ -1,0 +1,57 @@
+<icecast>
+
+  <!-- LIMITS -->
+  <limits>
+    <clients>10</clients>
+    <sources>10</sources>
+    <threadpool>5</threadpool>
+    <queue-size>524288</queue-size>
+    <client-timeout>30</client-timeout>
+    <header-timeout>15</header-timeout>
+    <source-timeout>10</source-timeout>
+    <burst-on-connect>1</burst-on-connect>
+    <burst-size>65535</burst-size>
+  </limits>
+
+  <!-- GENRIC -->
+  <authentication>
+    <source-password>pirateboxradioFTW!</source-password>
+    <admin-user>icecast</admin-user>
+    <admin-password>didyoujustsaythemagicword?</admin-password>
+  </authentication>
+  <hostname>dc01</hostname>
+  <listen-socket>
+    <port>8000</port>
+  </listen-socket>
+  <fileserve>1</fileserve>
+
+  <!-- PATHES -->
+  <paths>
+    <basedir>/opt/icecast/latest/share/icecast</basedir>
+    <webroot>/opt/icecast/latest/share/icecast/web</webroot>
+    <adminroot>/opt/icecast/latest/share/icecast/admin</adminroot>
+    <logdir>/mnt/usb/PirateBoxRadio/log/icecast</logdir>
+    <pidfile>/var/run/icecast/icecast.pid</pidfile>
+    <alias source="/" dest="/status.xsl"/>
+  </paths>
+
+  <!-- LOG -->
+  <logging>
+    <accesslog>access.log</accesslog>
+    <errorlog>error.log</errorlog>
+    <playlistlog>playlist.log</playlistlog>
+    <loglevel>1</loglevel>
+    <logsize>10000</logsize>
+    <logarchive>1</logarchive>
+  </logging>
+
+  <!-- SECURITY -->
+  <security>
+    <chroot>0</chroot>
+    <changeowner>
+      <user>icecast</user>
+      <group>icecast</group>
+    </changeowner>
+  </security>
+
+</icecast>
