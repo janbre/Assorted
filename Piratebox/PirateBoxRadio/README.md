@@ -8,13 +8,16 @@ As of now, only .ogg files is playable... that means NO MP3s!!! I might try and 
 
 For those of you who don't feel all that comfortable on the command line or when manually editing configuration files, or you don't want to spend the time setting it all up manually, there's a simple script that will set it all up for you. Just download the archive (PirateBoxRadio.zip), extract it and place it on the USB-stick you use with your PirateBox. The archive file contains all the needed packages, a setup script, a folder for storing logs and configuration files for ices and icecast. 
 
+This tutorial is partly based on this wonderful Icecast tutorial: http://karellen.blogspot.no/2011/12/streaming-audio-server-with-icecast.html
+You'll find lots more details there if you want to figure out how to configure Icecast and ices yourself
+
 ---END IMPORTANT---
 
 #### Using the setup script
 Log in to your PirateBox and navigate to the PirateBoxRadio-folder. If you placed it directly on the USB-stick the following command should do the trick: ```cd /mnt/usb/PirateBoxRadio```. Once there, execute the script with ```./setup.sh``` wait for it to finish and then move on to "Add some tunes" near the bottom of this tutorial.
 
 #### Getting started
-First you need to install some packages. You can download them from this repo or directly from OpenWrt at http://downloads.openwrt.org/snapshots/trunk/ar71xx/packages/
+First you need to install some packages. You can download them from this repo or directly from OpenWrt at http://downloads.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/packages/
 You'll need the following packages (not listing complete names, only what's needed to locate them with CTRL+F):
 - libshout
 - ices
@@ -53,7 +56,6 @@ ices
          |
           ----- librt
 ```
-
 
 #### Installing necessary packages
 There's no way all this is going to fit on rootfs, but luckily we have access to external storage on the USB-drive. Assuming you've placed the packages in a folder "packages" Let's install them with ```opkg install -d ext packages/*```
@@ -94,7 +96,10 @@ The rest of the file is basically just giving your pirate radio channel a name, 
 #### Add some tunes
 Now we're almost done! But we need to add some music! If you don't have any .ogg files at hand, you can download an awesome CC-licensed song which I've converted to .ogg here https://mega.co.nz/#!8skFTBRB!1ZB7himQzPXxnHs5MXtzVg4_UPir4COQXDQNhCCohUI 
 Original can be found here http://www.jamendo.com/en/artist/352184/conway-hambone and license here https://creativecommons.org/licenses/by-sa/3./0 
-Place it in ```/mnt/usb/PirateBox/Shared``` since you want to share it with the world. Now run the following command which will find all .ogg files and list their locations in playlist1.txt:
+
+You can either choose to upload music to your PB via the network (that's
+what it's designed for y'know), or if you want to fill it with lots of
+music quickly, connect the USB-stick to your computer and place the files in  ```/mnt/usb/PirateBox/Shared``` since you want to share it with the world. Now run the following command which will find all .ogg files and list their locations in playlist1.txt:
 ```
 find /mnt/usb -name "*.ogg" > /mnt/usb/playlist1.txt
 ```
@@ -108,12 +113,15 @@ Assuming you're in the folder where the configuration files are located we can n
 icecast -b -c icecast.xml
 ices ices.xml
 ```
-That's it! Now you can use e.g. VLC to open the network stream http://192.168.1.1:8000/one.ogg 
+That's it! Now you can use e.g. VLC to open the network stream http://pirateboxip:8000/one.ogg
+(Please note that pirateboxip is, surprisingly enough, the IP-address of your PirateBox. Mine is 192.168.1.1, but yours might be different. one.ogg is the name of the radio station, you can change this in ices.xml)
 
 Relax, lean back, and enjoy the melodies.
 
+If more music is added to the Shared-folder, or wherever you choose to
+place the files, just run the find-command, mentioned in the previous
+section, again and your playlist will be updated with the new files.
 
-
-Any problems, questions, complaints, interesting new profanities or anything else, drop me a PM on the forum or light a fire and hope that I notice your attempted smoke signals. 
+Any problems, questions, complaints, interesting new profanities or anything else, drop me a PM on the forum.
 
 
