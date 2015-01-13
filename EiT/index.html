@@ -12,9 +12,10 @@
 	<script src="geojson.js" type="text/javascript"></script>
 	<style type="text/css">
 		.leaflet-popup-content {
-			    width:auto !important;
+			    width: fit-content !important;
 		}
 	</style>
+
 	<script>
 
 
@@ -118,7 +119,7 @@
 		function onEachFeature(feature, layer) {
 			var popupContent = "";
 			if (feature.properties && feature.properties.title) {
-				popupContent += feature.properties.title + "\n";
+				popupContent += feature.properties.title + "<br>";
 			}
 			if (feature.properties && feature.properties.popupContent) {
 				popupContent += feature.properties.popupContent;
