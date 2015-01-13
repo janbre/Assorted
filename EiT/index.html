@@ -1,0 +1,135 @@
+<DOCTYPE html>
+<html>
+<head>
+	<title>Building Resilience to Urban Disaster</title>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+</head>
+<body>
+	<div id="map" style="width: 98wv; height: 98vh"></div>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="geojson.js" type="text/javascript"></script>
+	<style type="text/css">
+		.leaflet-popup-content {
+			    width:auto !important;
+		}
+	</style>
+	<script>
+
+
+		var fireStyle = {
+			"color": "#ff7880",
+			"weight": 1,
+			"opacity": 0.65,
+			"fillOpacity": 0.4
+		};
+
+		var clayStyle = {
+			"color": "#804a2d",
+			"weight": 1,
+			"opacity": 0.65,
+			"fillOpacity": 0.4
+		};
+
+/*************************************/
+/**  Read GeoJSON and create layers **/
+/*************************************/
+
+		// Map layer
+		var mapLink = "<a href='http://openstreetmap.org'>OpenStreetMap contributors</a>";
+		var mapquestLink = "<a href='http://www.mapquest.com//'>MapQuest</a>";
+		var mapquestPic = "<img src='http://developer.mapquest.com/content/osm/mq_logo.png'>";
+		var mapLayer = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png", {
+				attribution: "&copy; " + mapLink + ". Tiles courtesy of "+mapquestLink + " " + mapquestPic,
+				subdomains: ["otile1", "otile2", "otile3", "otile4"]
+		});
+
+		// Image layer
+		var images = L.geoJson(markers, {
+			filter: function (feature, layer) {
+				if (feature.properties) {
+					// If the property "underConstruction" exists and is true, return false (don't render features under construction)
+					return feature.properties.underConstruction !== undefined ? !feature.properties.underConstruction : true;
+				}
+				return false;
+			},
+			onEachFeature: onEachFeature
+		});
+
+		// Fire layer
+		var fire = L.geoJson(fireareas, {
+			style: fireStyle,
+			filter: function (feature, layer) {
+				if (feature.properties) {
+					// If the property "underConstruction" exists and is true, return false (don't render features under construction)
+					return feature.properties.underConstruction !== undefined ? !feature.properties.underConstruction : true;
+				}
+				return false;
+			},
+			onEachFeature: onEachFeature
+		});
+
+
+		// Flood layer
+		var flood = null;
+
+		// Quick clay layer
+		var quickClay = L.geoJson(quickClay, {
+			style: clayStyle,
+			filter: function (feature, layer) {
+				if (feature.properties) {
+					return feature.properties.underConstruction !== undefined ? !feature.properties.underConstruction : true;
+				}
+				return false;
+			},
+			onEachFeature: onEachFeature
+		});
+
+
+		// Historical layer
+		var history = null;
+
+
+		/// Create the map, center it on Trondheim and set zoom to 15 before adding layers
+		var map = L.map("map", {
+			center: [63.43387, 10.41384],
+			zoom: 14,
+			layers: [mapLayer, images, fire, quickClay]
+		});
+
+		// Can only have one basemap active at any time, but we only have one so let's comment it out
+		// to get a cleaner interface
+		var baseMaps = {
+			// "Normal": mapLayer
+		};
+
+		// Can have multiple overlays and switch between them, let's add one for every category
+		var overlayMaps = {
+			"Images": images,
+			"Fire": fire,
+			"Quick clay": quickClay
+		};
+
+		// Add layer switching controls to the map
+		L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+		// Functions
+		function onEachFeature(feature, layer) {
+			var popupContent = "";
+			if (feature.properties && feature.properties.title) {
+				popupContent += feature.properties.title + "\n";
+			}
+			if (feature.properties && feature.properties.popupContent) {
+				popupContent += feature.properties.popupContent;
+			}
+			if (feature.properties && feature.properties.img) {
+				popupContent += "\n" + feature.properties.img;
+			}
+			layer.bindPopup(popupContent);
+		}
+
+
+	</script>
+</body>
+</html>
