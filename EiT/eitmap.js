@@ -23,10 +23,11 @@ var hoverStyle = {
 
 var floodStyle;
 var geoJson;
-var fireType = "fire";
-var floodType = "flood";
-var quickClayType = "quickClay";
-var historicType = "historic";
+var fireType = "Fire";
+var floodType = "Flood";
+var quickClayType = "Quick Clay";
+var historicType = "Historic";
+var markerType = "Marker";
 
 /*************************************/
 /**  Read GeoJSON and create layers **/
@@ -133,23 +134,39 @@ function onEachFeature(feature, layer) {
 	layer.bindPopup(popupContent);
 }
 
+
+/******************************************/
+/**		Info box and hover effect		 **/
+/******************************************/
+
+// Used to highlight features. Style defines is highlight style
+// TODO: For some reason, layer.setStyle sometimes gives an error message "no such method"
 function highlightFeature(e) {
 	var layer = e.target;
-	console.log(layer);
-
-	layer.setStyle({
-		opacity: 1,
-		fillOpacity: 0.6
-	});
+//	console.log(layer);
+	if (layer.feature.properties.type !== null) {
+		console.log("marker hovered");
+		layer.setStyle({
+			opacity: 1,
+			fillOpacity: 0.6
+		});
+	}
 
 	if (!L.Browser.ie && !L.Browser.opera) {
 		layer.bringToFront();
 	}
+	info.update(e.target.feature.properties);
 }
 
+// TODO: sometimes results in error message geoJson "no such object"
 function resetHighlight(e) {
-	geJson = getStyle(e);
-	geoJson.resetStyle(e.target);
+	geoJson = getStyle(e);
+	if (geoJson === null) {
+		info.update();
+	} else {
+		geoJson.resetStyle(e.target);
+		info.update();
+	}
 }
 
 function onEachFeature(feature, layer) {
@@ -176,7 +193,22 @@ function getStyle(e) {
 			onEachFeature: onEachFeature
 		});
 		return geoJson;
+	} else if (type === markerType) {
+		console.log("Marker it is!");
+		return null;
 	}
 }
 
-	
+// Info box when hovering
+var info = L.control({position: "bottomright"});
+
+info.onAdd = function (map) {
+	this._div = L.DomUtil.create("div", "info"); // create a div with class info   
+	this.update();
+	return this._div;
+};
+
+info.update = function (properties) {
+	this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.type  + " risk area" : "");
+};
+info.addTo(map);
