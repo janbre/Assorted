@@ -5,7 +5,7 @@ var markers = {
       "type": "Feature",
       "properties": {
         "popupContent": "Innherredsveien 7",
-        "img": "<a href='img/team.jpg' target='_blank'><img src='img/team.png'/></a>"
+		"img": "300"
       },
       "geometry": {
         "type": "Point",
@@ -25,6 +25,7 @@ var fireareas = {
       "type": "Feature",
       "properties": {
         "title": "Møllenberg",
+		"type": "fire",
         "popupContent": "Danger of fire. Lots of students"
       },
       "geometry": {
@@ -70,6 +71,7 @@ var fireareas = {
     {
       "type": "Feature",
       "properties": {
+		"type": "fire",
         "popupContent": "It's turtles all the way down"
       },
       "geometry": {
@@ -123,13 +125,14 @@ var fireareas = {
   ]
 }
 
-var quickClay = {
+var quickClayAreas = {
   "type": "FeatureCollection",
   "features": [
     {
       "type": "Feature",
       "properties": {
         "title": "Bakklandet",
+		"type": "quickClay",
         "popupContent": "Quick clay area"
       },
       "geometry": {
