@@ -132,6 +132,11 @@ function onEachFeature(feature, layer) {
 		popupContent += "<br><a href='img/" + fullImage + "' target='_blank'><img src='img/" + smallImage + "'/></a>"; 
 	}
 	layer.bindPopup(popupContent);
+	layer.on({
+		mouseover: highlightFeature,
+		mouseout: resetHighlight
+	});
+
 }
 
 
@@ -140,25 +145,22 @@ function onEachFeature(feature, layer) {
 /******************************************/
 
 // Used to highlight features. Style defines is highlight style
-// TODO: For some reason, layer.setStyle sometimes gives an error message "no such method"
 function highlightFeature(e) {
 	var layer = e.target;
 //	console.log(layer);
-	if (layer.feature.properties.type !== null) {
-		console.log("marker hovered");
+	if (layer.feature.properties.type !== markerType && layer.feature.properties.type !== historicType) {
 		layer.setStyle({
 			opacity: 1,
 			fillOpacity: 0.6
 		});
+		if (!L.Browser.ie && !L.Browser.opera) {
+			layer.bringToFront();
+		}
 	}
 
-	if (!L.Browser.ie && !L.Browser.opera) {
-		layer.bringToFront();
-	}
 	info.update(e.target.feature.properties);
 }
 
-// TODO: sometimes results in error message geoJson "no such object"
 function resetHighlight(e) {
 	geoJson = getStyle(e);
 	if (geoJson === null) {
@@ -169,12 +171,13 @@ function resetHighlight(e) {
 	}
 }
 
-function onEachFeature(feature, layer) {
+// TODO: Looks like it's only possible to have one of these function... possible to rename?
+/**function onEachFeature(feature, layer) {
 	layer.on({
 		mouseover: highlightFeature,
 		mouseout: resetHighlight
 	});
-}
+}**/
 
 
 function getStyle(e) {
@@ -193,8 +196,8 @@ function getStyle(e) {
 			onEachFeature: onEachFeature
 		});
 		return geoJson;
-	} else if (type === markerType) {
-		console.log("Marker it is!");
+	} else if (type === markerType || type === historicType) {
+		onEachFeature: onEachFeature;
 		return null;
 	}
 }
@@ -209,6 +212,11 @@ info.onAdd = function (map) {
 };
 
 info.update = function (properties) {
-	this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.type  + " risk area" : "");
+	var p = (properties ? properties.type : "");
+	if (p === markerType || p === historicType) {
+		this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.title : "");
+	} else {
+		this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.type  + " risk area" : "");
+	}
 };
 info.addTo(map);

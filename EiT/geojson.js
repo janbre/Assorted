@@ -15,6 +15,22 @@ var markers = {
           63.43381610012737
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Historic",
+        "title": "Quick clay slide 2012",
+        "popupContent": "Quick clay slide at Esp in 2012. 50m wide, 350m long. Over 40 people evacuated, but no loss of life.",
+        "link": "http://www.nrk.no/trondelag/slik-ser-rasomradet-ut-fra-lufta-1.7936077"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.142097473144531,
+          63.39152174400882
+        ]
+      }
     }
   ]
 }
@@ -179,6 +195,6 @@ var quickClayAreas = {
           ]
         ]
       }
-    }
+    },
   ]
 }
