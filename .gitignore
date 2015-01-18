@@ -1,0 +1,6 @@
+.*.js.swp
+.*.html.swp
+*.swp
+*.tmp
+*.class
+*.pyc
