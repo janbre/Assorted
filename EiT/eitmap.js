@@ -16,6 +16,14 @@ var quickClayStyle = {
 	"fillOpacity": 0.4
 };
 
+var levels = {
+	quickClayLevels: [
+		"#444444",
+		"#111111",
+		"#987654"
+	]
+};
+
 var hoverStyle = {
 	"opacity": 1,
 	"fillOpacity": 0.8
@@ -76,6 +84,7 @@ var damBreak = null;
 
 // Quick clay layer
 var quickClay = L.geoJson(quickClayAreas, {
+
 	style: quickClayStyle,
 	filter: function (feature, layer) {
 		if (feature.properties) {
@@ -131,6 +140,19 @@ function onEachFeature(feature, layer) {
 		var smallImage = feature.properties.img + "_small" + fileType;
 		popupContent += "<br><a href='img/" + fullImage + "' target='_blank'><img src='img/" + smallImage + "'/></a>"; 
 	}
+
+	if (feature.properties.type === quickClayType) {
+		var levelColor = getDangerLevel(feature);
+		layer.setStyle({
+			color: levelColor
+		});
+		//if (feature.properties.level === "1") {
+		//	console.log("level 1!");
+		//	layer.setStyle({
+		//		color: "#444444"
+		//	});
+		//}
+	}
 	layer.bindPopup(popupContent);
 	layer.on({
 		mouseover: highlightFeature,
@@ -169,16 +191,26 @@ function resetHighlight(e) {
 		geoJson.resetStyle(e.target);
 		info.update();
 	}
+	resetLevels(e);
 }
 
-// TODO: Looks like it's only possible to have one of these function... possible to rename?
-/**function onEachFeature(feature, layer) {
-	layer.on({
-		mouseover: highlightFeature,
-		mouseout: resetHighlight
-	});
-}**/
+function resetLevels(e) {
+	if (e.target.feature.properties.type === quickClayType) {
+		var levelColor = getDangerLevel(e.target.feature);
+		e.target.setStyle({
+			color: levelColor
+		});
+	}
+}
 
+function getDangerLevel(feature) {
+	var level = parseInt(feature.properties.level);
+	var type = feature.properties.type;
+
+	if (type === quickClayType) {
+		return levels.quickClayLevels[level];
+	}
+}
 
 function getStyle(e) {
 	var type = e.target.feature.properties.type;
