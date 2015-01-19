@@ -134,6 +134,9 @@ function onEachFeature(feature, layer) {
 	if (feature.properties && feature.properties.popupContent) {
 		popupContent += feature.properties.popupContent;
 	}
+	if (feature.properties && feature.properties.source) {
+		popupContent += "<a href=" + feature.properties.source + ">Source</a>";
+	}
 	if (feature.properties && feature.properties.img) {
 		var fileType = ".png";
 		var fullImage = feature.properties.img + fileType;
