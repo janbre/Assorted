@@ -16,6 +16,13 @@ var quickClayStyle = {
 	"fillOpacity": 0.4
 };
 
+var floodStyle = {
+	"color": "#0000ff",
+	"weight": 1,
+	"opacity": 1,
+	"fillOpacity": 1
+};
+
 var levels = {
 	quickClayLevels: [
 		"#444444",
@@ -29,7 +36,6 @@ var hoverStyle = {
 	"fillOpacity": 0.8
 };
 
-var floodStyle;
 var geoJson;
 var fireType = "Fire";
 var floodType = "Flood";
@@ -77,7 +83,16 @@ var fire = L.geoJson(fireareas, {
 
 
 // Flood layer
-var flood = null;
+var flood = L.geoJson(floodareas, {
+	style: floodStyle,
+	filter: function (feature, layer) {
+		if (feature.properties) {
+			return feature.properties.underConstruction !== undefined ? !feature.properties.underConstruction : true;
+		}
+		return false;
+	},
+	onEachFeature: onEachFeature
+});
 
 // Dam break layer
 var damBreak = null;
@@ -104,7 +119,7 @@ var history = null;
 var map = L.map("map", {
 	center: [63.43387, 10.41384],
 	zoom: 14,
-	layers: [mapLayer, images, fire, quickClay]
+	layers: [mapLayer, images, fire, quickClay, flood]
 });
 
 // Can only have one basemap active at any time, but we only have one so let's comment it out
@@ -117,7 +132,8 @@ var baseMaps = {
 var overlayMaps = {
 	"Images": images,
 	"Fire": fire,
-	"Quick clay": quickClay
+	"Quick clay": quickClay,
+	"500-year Flood": flood
 };
 
 // Add layer switching controls to the map
@@ -181,6 +197,9 @@ function highlightFeature(e) {
 		if (!L.Browser.ie && !L.Browser.opera) {
 			layer.bringToFront();
 		}
+	}
+	if (layer.feature.properties.ORIG_FID) {
+		console.log(layer.feature.properties.ORIG_FID);
 	}
 
 	info.update(e.target.feature.properties);
