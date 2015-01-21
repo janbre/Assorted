@@ -1,6 +1,5 @@
-// TODO: - new color scheme for quickclay areas; colors for risk level 1-5 (risk is consequence x probability)
-// 		 - try to find raw data for the social maps (Irmelins article)
-// 		 - display information from quickclay geoJSON (stedsnavn, etc)
+// TODO: 
+// - try to find raw data for the social maps (Irmelins article)
 /*************************************/
 /*		Styling for polygons		 */
 /*************************************/
@@ -23,7 +22,7 @@ var floodStyle = {
 	"color": "#0000ff",
 	"weight": 1,
 	"opacity": 1,
-	"fillOpacity": 1
+	"fillOpacity": 0.3
 };
 
 var levels = {
@@ -43,8 +42,8 @@ var hoverStyle = {
 
 var geoJson;
 var fireType = "Fire";
-var floodType = "Flood";
-var quickClayType = "quickClay";
+var floodType = "FlomAreal";
+var quickClayType = "KvikkleireFaresone";
 var historicType = "Historic";
 var markerType = "Marker";
 
@@ -145,7 +144,8 @@ var overlayMaps = {
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 // Functions
-function onEachFeature(feature, layer) {
+// TODO: Delete obsolote code below after testing everything is working
+/*function onEachFeature(feature, layer) {
 	var popupContent = "";
 	var img = "";
 
@@ -184,6 +184,53 @@ function onEachFeature(feature, layer) {
 	});
 
 }
+*/
+function onEachFeature(feature, layer) {
+	var popUpContent = "";
+	var img = "";
+	switch (feature.properties.objType) {
+		case quickClayType:
+			var levelColor = getDangerLevel(feature);
+			layer.setStyle({
+				color: levelColor
+			});
+			break;
+		case fireType:
+			popupContent = getFirePopup(feature);
+			break;
+		case floodType:
+			popupContent = getFloodPopup(feature);
+			break;
+		case markerType:
+			popupContent = "MARKER!";
+			layer.bindPopup(popupContent);
+			break;
+		default:
+			popupContent = "Unknown feature type";
+	}
+	layer.on({
+		mouseover: highlightFeature,
+		mouseout: resetHighlight
+	});
+}
+
+
+function getQuickClayPopup(feature) {
+	var popupContent = "";
+
+	popupContent = "<a href='http://gis3.nve.no/nvedatanedlast/Default.aspx'>Source</a>";
+	return popupContent;
+}
+
+function getFirePopup(feature) {
+	var popupContent = "";
+	return "FIRE!";
+}
+
+function getFloodPopup(feature) {
+	var popupContent = "";
+	return "FLOOD!";
+}
 
 
 /******************************************/
@@ -194,7 +241,7 @@ function onEachFeature(feature, layer) {
 function highlightFeature(e) {
 	var layer = e.target;
 //	console.log(layer);
-	if (layer.feature.properties.type !== markerType && layer.feature.properties.type !== historicType) {
+	if (layer.feature.properties.objType !== markerType && layer.feature.properties.objType !== historicType) {
 		layer.setStyle({
 			opacity: 1,
 			fillOpacity: 0.6
@@ -222,7 +269,7 @@ function resetHighlight(e) {
 }
 
 function resetLevels(e) {
-	if (e.target.feature.properties.type === quickClayType) {
+	if (e.target.feature.properties.objType === quickClayType) {
 		var levelColor = getDangerLevel(e.target.feature);
 		e.target.setStyle({
 			color: levelColor
@@ -232,16 +279,40 @@ function resetLevels(e) {
 
 function getDangerLevel(feature) {
 	var level = feature.properties.risikoKl;
-	var type = feature.properties.type;
+	var type = feature.properties.objType;
 
 	if (type === quickClayType) {
-		console.log(levels.quickClayLevels[level]);
 		return levels.quickClayLevels[level - 1];
 	}
 }
 
 function getStyle(e) {
-	var type = e.target.feature.properties.type;
+	switch (e.target.feature.properties.objType) {
+		case quickClayType:
+			geoJson = L.geoJson(quickClayAreas, {
+				style: quickClayStyle,
+				onEachFeature: onEachFeature
+			});
+			break;
+		case fireType:
+			geoJson = L.geoJson(fireareas, {
+				style: fireStyle,
+				onEachFeature: onEachFeature
+			});
+			break;
+		case floodType:
+			geoJson = L.geoJson(floodareas, {
+				style: floodStyle,
+				onEachFeature: onEachFeature
+			});
+			break;
+		default:
+			onEachFeature: onEachFeature;
+			geoJson = null;
+	}
+	return geoJson;
+}
+/*	var type = e.target.feature.properties.type;
 	if (type === fireType) {
 		console.log("Fire it is!");
 		geoJson = L.geoJson(fireareas, {
@@ -260,7 +331,7 @@ function getStyle(e) {
 		onEachFeature: onEachFeature;
 		return null;
 	}
-}
+}*/
 
 // Info box when hovering
 var info = L.control({position: "bottomright"});
@@ -272,11 +343,20 @@ info.onAdd = function (map) {
 };
 
 info.update = function (properties) {
-	var p = (properties ? properties.type : "");
+	var p = (properties ? properties.objType : "");
 	if (p === markerType || p === historicType) {
 		this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.title : "");
+	}else if (p === quickClayType) {
+		info.updateQuickClay(properties);
 	} else {
-		this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.type  + " risk area" : "");
+		this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.objType  + " risk area" : "");
 	}
 };
+
+info.updateQuickClay = function (properties) {
+	this._div.innerHTML = "<h4>Quick clay area</h4><h4>" + (properties ? properties.skrdOmrNvn : "") + "</h4>";
+	this._div.innerHTML += "<p>Risk rating: " + (properties ? properties.risikoKl : "") + "</p>";
+	this._div.innerHTML += "<p><i>Risk = (probability + consequence)</i></p>";
+};
+
 info.addTo(map);
