@@ -1,3 +1,6 @@
+// TODO: - new color scheme for quickclay areas; colors for risk level 1-5 (risk is consequence x probability)
+// 		 - try to find raw data for the social maps (Irmelins article)
+// 		 - display information from quickclay geoJSON (stedsnavn, etc)
 /*************************************/
 /*		Styling for polygons		 */
 /*************************************/
@@ -13,7 +16,7 @@ var quickClayStyle = {
 	"color": "#804a2d",
 	"weight": 1,
 	"opacity": 0.65,
-	"fillOpacity": 0.4
+	"fillOpacity": 0.3
 };
 
 var floodStyle = {
@@ -25,9 +28,11 @@ var floodStyle = {
 
 var levels = {
 	quickClayLevels: [
-		"#444444",
-		"#111111",
-		"#987654"
+		"#00FF66",
+		"#FFFF66",
+		"#FFCC00",
+		"#FF9900",
+		"#FF0000"
 	]
 };
 
@@ -39,7 +44,7 @@ var hoverStyle = {
 var geoJson;
 var fireType = "Fire";
 var floodType = "Flood";
-var quickClayType = "Quick Clay";
+var quickClayType = "quickClay";
 var historicType = "Historic";
 var markerType = "Marker";
 
@@ -226,11 +231,12 @@ function resetLevels(e) {
 }
 
 function getDangerLevel(feature) {
-	var level = parseInt(feature.properties.level);
+	var level = feature.properties.risikoKl;
 	var type = feature.properties.type;
 
 	if (type === quickClayType) {
-		return levels.quickClayLevels[level];
+		console.log(levels.quickClayLevels[level]);
+		return levels.quickClayLevels[level - 1];
 	}
 }
 
@@ -245,7 +251,7 @@ function getStyle(e) {
 		return geoJson;
 	} else if (type === quickClayType) {
 		console.log("Quickclay it is!");
-		geoJson = L.geoJson(quickClayAreas, { 
+		geoJson = L.geoJson(quickClayAreas, {
 			style: quickClayStyle,
 			onEachFeature: onEachFeature
 		});
@@ -260,7 +266,7 @@ function getStyle(e) {
 var info = L.control({position: "bottomright"});
 
 info.onAdd = function (map) {
-	this._div = L.DomUtil.create("div", "info"); // create a div with class info   
+	this._div = L.DomUtil.create("div", "info"); // create a div with class info
 	this.update();
 	return this._div;
 };
