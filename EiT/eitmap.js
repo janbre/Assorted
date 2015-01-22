@@ -1,5 +1,4 @@
 // TODO: 
-// - try to find raw data for the social maps (Irmelins article)
 /*************************************/
 /*		Styling for polygons		 */
 /*************************************/
@@ -51,7 +50,6 @@ var markerType = "Marker";
 /**  Read GeoJSON and create layers **/
 /*************************************/
 
-// Map layer
 var mapLink = "<a href='http://openstreetmap.org'>OpenStreetMap contributors</a>";
 var mapquestLink = "<a href='http://www.mapquest.com//'>MapQuest</a>";
 var mapquestPic = "<img src='http://developer.mapquest.com/content/osm/mq_logo.png'>";
@@ -60,7 +58,6 @@ var mapLayer = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png
 		subdomains: ["otile1", "otile2", "otile3", "otile4"]
 });
 
-// Image layer
 var historicLayer = L.geoJson(historic, {
 	filter: function (feature, layer) {
 		if (feature.properties) {
@@ -72,7 +69,6 @@ var historicLayer = L.geoJson(historic, {
 	onEachFeature: onEachFeature
 });
 
-// Fire layer
 var fireLayer = L.geoJson(fireareas, {
 	style: fireStyle,
 	filter: function (feature, layer) {
@@ -85,8 +81,6 @@ var fireLayer = L.geoJson(fireareas, {
 	onEachFeature: onEachFeature
 });
 
-
-// Flood layer
 var floodLayer = L.geoJson(floodareas, {
 	style: floodStyle,
 	filter: function (feature, layer) {
@@ -98,12 +92,9 @@ var floodLayer = L.geoJson(floodareas, {
 	onEachFeature: onEachFeature
 });
 
-// Dam break layer
-var damBreak = null;
+var damBreakLayer = null;
 
-// Quick clay layer
 var quickClayLayer = L.geoJson(quickClayAreas, {
-
 	style: quickClayStyle,
 	filter: function (feature, layer) {
 		if (feature.properties) {
@@ -115,8 +106,7 @@ var quickClayLayer = L.geoJson(quickClayAreas, {
 });
 
 
-// Historical layer
-var history = null;
+var imageLayer = null;
 
 
 /// Create the map, center it on Trondheim and set zoom to 15 before adding layers
@@ -144,47 +134,6 @@ var overlayMaps = {
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 // Functions
-// TODO: Delete obsolote code below after testing everything is working
-/*function onEachFeature(feature, layer) {
-	var popupContent = "";
-	var img = "";
-
-	if (feature.properties && feature.properties.title) {
-		popupContent += feature.properties.title + "<br>";
-	}
-	if (feature.properties && feature.properties.popupContent) {
-		popupContent += feature.properties.popupContent;
-	}
-	if (feature.properties && feature.properties.source) {
-		popupContent += "<a href=" + feature.properties.source + ">Source</a>"; // add target=_blank
-	}
-	if (feature.properties && feature.properties.img) {
-		var fileType = ".png";
-		var fullImage = feature.properties.img + fileType;
-		var smallImage = feature.properties.img + "_small" + fileType;
-		popupContent += "<br><a href='img/" + fullImage + "' target='_blank'><img src='img/" + smallImage + "'/></a>"; 
-	}
-
-	if (feature.properties.type === quickClayType) {
-		var levelColor = getDangerLevel(feature);
-		layer.setStyle({
-			color: levelColor
-		});
-		//if (feature.properties.level === "1") {
-		//	console.log("level 1!");
-		//	layer.setStyle({
-		//		color: "#444444"
-		//	});
-		//}
-	}
-	layer.bindPopup(popupContent);
-	layer.on({
-		mouseover: highlightFeature,
-		mouseout: resetHighlight
-	});
-
-}
-*/
 function onEachFeature(feature, layer) {
 	var popUpContent = "";
 	var img = "";
@@ -202,17 +151,7 @@ function onEachFeature(feature, layer) {
 			popupContent = getFloodPopup(feature);
 			break;
 		case historicType:
-			popupContent = "<h3>" + feature.properties.title + "</h3>";
-			popupContent += "<p>" + feature.properties.popupContent  + "</p>";
-			if (feature.properties.img) {
-				var fileType = ".jpg";
-				var fullImage = feature.properties.img + fileType;
-				var smallImage = feature.properties.img + "_small" + fileType;
-				popupContent += "<br><a href='img/" + fullImage + "' target='_blank'><img src='img/" + smallImage + "'/></a>";
-			}
-			if (feature.properties.source) {
-				popupContent += "<a href='" + feature.properties.source + "'>Source</a>";
-			}
+			popupContent = getHistoryPopup(feature);
 			layer.bindPopup(popupContent);
 			break;
 		default:
@@ -222,6 +161,22 @@ function onEachFeature(feature, layer) {
 		mouseover: highlightFeature,
 		mouseout: resetHighlight
 	});
+}
+
+function getHistoryPopup(feature) {
+	var popupContent = "";
+	popupContent = "<h3>" + feature.properties.title + "</h3>";
+	popupContent += "<p>" + feature.properties.popupContent  + "</p>";
+	if (feature.properties.img) {
+		var fileType = ".jpg";
+		var fullImage = feature.properties.img + fileType;
+		var smallImage = feature.properties.img + "_small" + fileType;
+		popupContent += "<br><a href='img/" + fullImage + "' target='_blank'><img src='img/" + smallImage + "'/></a>";
+	}
+	if (feature.properties.source) {
+		popupContent += "<a href='" + feature.properties.source + "'>Source</a>";
+	}
+	return popupContent;
 }
 
 
@@ -322,27 +277,6 @@ function getStyle(e) {
 	}
 	return geoJson;
 }
-// TODO: delete obsolete code below after testing everything works
-/*	var type = e.target.feature.properties.type;
-	if (type === fireType) {
-		console.log("Fire it is!");
-		geoJson = L.geoJson(fireareas, {
-			style: fireStyle,
-			onEachFeature: onEachFeature
-		});
-		return geoJson;
-	} else if (type === quickClayType) {
-		console.log("Quickclay it is!");
-		geoJson = L.geoJson(quickClayAreas, {
-			style: quickClayStyle,
-			onEachFeature: onEachFeature
-		});
-		return geoJson;
-	} else if (type === markerType || type === historicType) {
-		onEachFeature: onEachFeature;
-		return null;
-	}
-}*/
 
 // Info box when hovering
 var info = L.control({position: "bottomright"});
