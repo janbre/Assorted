@@ -1,5 +1,6 @@
 .leaflet-popup-content {
 	width: fit-content !important;
+	font: 14px/16px Arial, Helvetica, sans-serif;
 }
 
 .info {
@@ -11,7 +12,17 @@
 	border-radius: 5px;
 }
 
+.info h3 {
+	margin: 0 0 5px;
+	color: #777;
+}
+
 .info h4 {
 	margin: 0 0 5px;
 	color: #777;
+}
+
+.leaflet-popup  h4 {
+	color: #777;
+	margin: 0 0 5px;
 }

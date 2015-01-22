@@ -61,7 +61,7 @@ var mapLayer = L.tileLayer("http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png
 });
 
 // Image layer
-var images = L.geoJson(markers, {
+var historicLayer = L.geoJson(historic, {
 	filter: function (feature, layer) {
 		if (feature.properties) {
 			// If the property "underConstruction" exists and is true, return false (don't render features under construction)
@@ -73,7 +73,7 @@ var images = L.geoJson(markers, {
 });
 
 // Fire layer
-var fire = L.geoJson(fireareas, {
+var fireLayer = L.geoJson(fireareas, {
 	style: fireStyle,
 	filter: function (feature, layer) {
 		if (feature.properties) {
@@ -87,7 +87,7 @@ var fire = L.geoJson(fireareas, {
 
 
 // Flood layer
-var flood = L.geoJson(floodareas, {
+var floodLayer = L.geoJson(floodareas, {
 	style: floodStyle,
 	filter: function (feature, layer) {
 		if (feature.properties) {
@@ -102,7 +102,7 @@ var flood = L.geoJson(floodareas, {
 var damBreak = null;
 
 // Quick clay layer
-var quickClay = L.geoJson(quickClayAreas, {
+var quickClayLayer = L.geoJson(quickClayAreas, {
 
 	style: quickClayStyle,
 	filter: function (feature, layer) {
@@ -122,8 +122,8 @@ var history = null;
 /// Create the map, center it on Trondheim and set zoom to 15 before adding layers
 var map = L.map("map", {
 	center: [63.43387, 10.41384],
-	zoom: 14,
-	layers: [mapLayer, images, fire, quickClay, flood]
+	zoom: 13,
+	layers: [mapLayer, historicLayer, fireLayer, quickClayLayer, floodLayer]
 });
 
 // Can only have one basemap active at any time, but we only have one so let's comment it out
@@ -134,10 +134,10 @@ var baseMaps = {
 
 // Can have multiple overlays and switch between them, let's add one for every category
 var overlayMaps = {
-	"Images": images,
-	"Fire": fire,
-	"Quick clay": quickClay,
-	"500-year Flood": flood
+	"Historic": historicLayer,
+	"Fire": fireLayer,
+	"Quick clay": quickClayLayer,
+	"500-year Flood": floodLayer
 };
 
 // Add layer switching controls to the map
@@ -201,8 +201,18 @@ function onEachFeature(feature, layer) {
 		case floodType:
 			popupContent = getFloodPopup(feature);
 			break;
-		case markerType:
-			popupContent = "MARKER!";
+		case historicType:
+			popupContent = "<h3>" + feature.properties.title + "</h3>";
+			popupContent += "<p>" + feature.properties.popupContent  + "</p>";
+			if (feature.properties.img) {
+				var fileType = ".jpg";
+				var fullImage = feature.properties.img + fileType;
+				var smallImage = feature.properties.img + "_small" + fileType;
+				popupContent += "<br><a href='img/" + fullImage + "' target='_blank'><img src='img/" + smallImage + "'/></a>";
+			}
+			if (feature.properties.source) {
+				popupContent += "<a href='" + feature.properties.source + "'>Source</a>";
+			}
 			layer.bindPopup(popupContent);
 			break;
 		default:
@@ -312,6 +322,7 @@ function getStyle(e) {
 	}
 	return geoJson;
 }
+// TODO: delete obsolete code below after testing everything works
 /*	var type = e.target.feature.properties.type;
 	if (type === fireType) {
 		console.log("Fire it is!");
@@ -348,6 +359,8 @@ info.update = function (properties) {
 		this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.title : "");
 	}else if (p === quickClayType) {
 		info.updateQuickClay(properties);
+	} else if (p === floodType) {
+		this._div.innerHTML = "<h4>Information</h4>";
 	} else {
 		this._div.innerHTML = "<h4>Information</h4>" + (properties ? properties.objType  + " risk area" : "");
 	}
