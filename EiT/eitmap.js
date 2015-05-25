@@ -1,4 +1,5 @@
 // TODO: 
+//// Institution layer: 22B, Frelsesarmeen, Vår Frue kirke, Kirkens Bymisjon, Omsorgskafeen, Sorgenfri
 /*************************************/
 /*		Styling for polygons		 */
 /*************************************/
